@@ -11,32 +11,32 @@ export default class PromosController {
     public async store({ request, response }: HttpContext) {
         try {
             const imageFile = request.file('image', {
-            size: '2mb',
-            extnames: ['jpg', 'png', 'jpeg'],
+                size: '2mb',
+                extnames: ['jpg', 'png', 'jpeg'],
             })
 
             if (!imageFile) {
-            return response.badRequest({ message: 'Image is required' })
+                return response.badRequest({ message: 'Image is required' })
             }
 
             await imageFile.move('public/images', {
-            name: imageFile.clientName,
-            overwrite: true,
+                name: imageFile.clientName,
+                overwrite: true,
             })
 
             const promo = await Promo.create({
-            title: request.input('title'),
-            description: request.input('description'),
-            expired: request.input('expired'),
-            image: `images/${imageFile.clientName}`,
+                title: request.input('title'),
+                description: request.input('description'),
+                expired: request.input('expired'),
+                image: `images/${imageFile.clientName}`,
             })
 
             return response.created(promo)
         } catch (err) {
             console.error(err)
             return response.status(500).send({
-            message: 'Gagal menyimpan promo',
-            error: err.message,
+                message: 'Gagal menyimpan promo',
+                error: err.message,
             })
         }
     }
