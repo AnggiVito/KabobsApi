@@ -9,36 +9,49 @@ export default class KariersController {
         let query = Karier.query()
 
         if (lokasi && lokasi !== 'Semua Lokasi') {
-            query = query.where('lokasi', 'LIKE', `%${lokasi}%`)
+            query = query.where('kota', 'LIKE', `%${lokasi}%`)
         }
 
         if (posisi && posisi !== 'Semua Posisi') {
-            query = query.where('jenis', 'LIKE', `%${posisi}%`).orWhere('nama', 'LIKE', `%${posisi}%`)
+            query = query.where('worktype', 'LIKE', `%${posisi}%`).orWhere('namaposisi', 'LIKE', `%${posisi}%`)
         }
 
         if (keyword) {
             query = query.where((subQuery) => {
-                subQuery.where('nama', 'LIKE', `%${keyword}%`)
-                .orWhere('lokasi', 'LIKE', `%${keyword}%`)
-                .orWhere('keahlian', 'LIKE', `%${keyword}%`)
-                .orWhere('jenis', 'LIKE', `%${keyword}%`)
+                subQuery.where('namaposisi', 'LIKE', `%${keyword}%`)
+                .orWhere('kota', 'LIKE', `%${keyword}%`)
+                .orWhere('provinsi', 'LIKE', `%${keyword}%`)
+                .orWhere('job_summary', 'LIKE', `%${keyword}%`)
+                .orWhere('worktype', 'LIKE', `%${keyword}%`)
+                .orWhere('deskripsi', 'LIKE', `%${keyword}%`)
+                .orWhere('job_requirement', 'LIKE', `%${keyword}%`)
             })
         }
 
-        const kariers = await query.orderBy('created_at', 'desc')
+        const kariers = await query.orderBy('db_created_at', 'desc')
         return response.ok(kariers)
     }
 
     public async store({ request, response }: HttpContext) {
         const karierSchema = schema.create({
-                nama: schema.string([rules.trim(), rules.minLength(3)]),
-                jenis: schema.string([rules.trim(), rules.minLength(2)]),
-                lokasi: schema.string([rules.trim(), rules.minLength(3)]),
-                keahlian: schema.string([rules.trim(), rules.minLength(10)]),
-            })
+            posting: schema.date({ format: 'iso' }),
+            namaposisi: schema.string([rules.trim(), rules.minLength(3)]),
+            kota: schema.string([rules.trim(), rules.minLength(3)]),
+            provinsi: schema.string([rules.trim(), rules.minLength(2)]),
+            workplace: schema.string([rules.trim()]),
+            worktype: schema.string([rules.trim()]),
+            paytype: schema.string([rules.trim()]),
+            payrangeFrom: schema.number.nullableAndOptional(),
+            payrangeTo: schema.number.nullableAndOptional(),
+            deskripsi: schema.string([rules.trim(), rules.minLength(10)]),
+            job_summary: schema.string([rules.trim(), rules.minLength(10)]),
+            job_requirement: schema.string([rules.trim(), rules.minLength(10)]),
+        })
 
         try {
             const payload = await request.validate({ schema: karierSchema })
+
+
             const karier = await Karier.create(payload)
             return response.created({
                 message: 'Posisi karier berhasil ditambahkan!',
@@ -54,7 +67,7 @@ export default class KariersController {
             }
             return response.internalServerError({
                 message: 'Gagal menyimpan posisi karier. Silakan coba lagi nanti.',
-                error: error.message,
+                error: error.message || 'Terjadi kesalahan server.',
             })
         }
     }
@@ -73,15 +86,23 @@ export default class KariersController {
             return response.notFound({ message: 'Posisi karier tidak ditemukan' })
         }
 
-        const karierSchema = schema.create({
-            nama: schema.string.optional([rules.trim(), rules.minLength(3)]),
-            jenis: schema.string.optional([rules.trim(), rules.minLength(2)]),
-            lokasi: schema.string.optional([rules.trim(), rules.minLength(3)]),
-            keahlian: schema.string.optional([rules.trim(), rules.minLength(10)]),
+        const updateSchema = schema.create({
+            posting: schema.date.optional(),
+            namaposisi: schema.string.optional([rules.trim(), rules.minLength(3)]),
+            kota: schema.string.optional([rules.trim(), rules.minLength(3)]),
+            provinsi: schema.string.optional([rules.trim(), rules.minLength(2)]),
+            workplace: schema.string.optional([rules.trim()]),
+            worktype: schema.string.optional([rules.trim()]),
+            paytype: schema.string.optional([rules.trim()]),
+            payrangeFrom: schema.number.nullableAndOptional(),
+            payrangeTo: schema.number.nullableAndOptional(),
+            deskripsi: schema.string.optional([rules.trim(), rules.minLength(10)]),
+            jobSummary: schema.string.optional([rules.trim(), rules.minLength(10)]),
+            jobRequirement: schema.string.optional([rules.trim(), rules.minLength(10)]),
         })
 
         try {
-            const payload = await request.validate({ schema: karierSchema })
+            const payload = await request.validate({ schema: updateSchema })
             karier.merge(payload)
             await karier.save()
             return response.ok({
@@ -98,7 +119,7 @@ export default class KariersController {
             }
             return response.internalServerError({
                 message: 'Gagal memperbarui posisi karier. Silakan coba lagi nanti.',
-                error: error.message,
+                error: error.message || 'Terjadi kesalahan server.',
             })
         }
     }

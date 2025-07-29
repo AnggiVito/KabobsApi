@@ -7,21 +7,45 @@ export default class Karier extends BaseModel {
   @column({ isPrimary: true })
   declare id: number
 
-  @column()
-  declare nama: string
+  @column.date()
+  declare posting: DateTime 
 
   @column()
-  declare jenis: string
+  declare namaposisi: string
 
   @column()
-  declare lokasi: string
+  declare kota: string
 
   @column()
-  declare keahlian: string
+  declare provinsi: string
+
+  @column()
+  declare workplace: string
+
+  @column()
+  declare worktype: string
+
+  @column()
+  declare paytype: string
+
+  @column()
+  declare payrangeFrom: number | null
+
+  @column()
+  declare payrangeTo: number | null
+
+  @column()
+  declare deskripsi: string
+
+  @column()
+  declare job_summary: string
+
+  @column()
+  declare job_requirement: string
 
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  declare dbCreatedAt: DateTime 
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  declare dbUpdatedAt: DateTime
 }
