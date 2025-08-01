@@ -17,6 +17,7 @@ const ContactsController = () => import('#controllers/contacs_controller')
 const KariersController = () => import('#controllers/kariers_controller')
 const MenusController = () => import('#controllers/menus_controller')
 const LocationsController = () => import('#controllers/locations_controller')
+const SubmissionsController = () => import('#controllers/submissions_controller')
 
 router.get('/', async () => {
   return {
@@ -64,6 +65,13 @@ router.post('locations', [LocationsController, 'store'])
 router.get('locations/:id', [LocationsController, 'show'])
 router.put('locations/:id', [LocationsController, 'update'])
 router.delete('locations/:id', [LocationsController, 'destroy'])
+
+// Subbmission
+router.get('submissions', [SubmissionsController, 'index'])
+router.post('submissions', [SubmissionsController, 'store'])
+router.get('submissions/:id', [SubmissionsController, 'show'])
+router.put('submissions/:id', [SubmissionsController, 'update'])
+router.delete('submissions/:id', [SubmissionsController, 'destroy'])
 
 // Gambar
 router.get('/images/:filename', async ({ response, params }) => {
