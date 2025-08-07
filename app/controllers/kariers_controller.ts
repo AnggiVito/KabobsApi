@@ -20,11 +20,8 @@ export default class KariersController {
             query = query.where((subQuery) => {
                 subQuery.where('namaposisi', 'LIKE', `%${keyword}%`)
                 .orWhere('kota', 'LIKE', `%${keyword}%`)
-                .orWhere('provinsi', 'LIKE', `%${keyword}%`)
-                .orWhere('job_summary', 'LIKE', `%${keyword}%`)
+                .orWhere('jobSummary', 'LIKE', `%${keyword}%`)
                 .orWhere('worktype', 'LIKE', `%${keyword}%`)
-                .orWhere('deskripsi', 'LIKE', `%${keyword}%`)
-                .orWhere('job_requirement', 'LIKE', `%${keyword}%`)
             })
         }
 
@@ -44,8 +41,8 @@ export default class KariersController {
             payrangeFrom: schema.number.nullableAndOptional(),
             payrangeTo: schema.number.nullableAndOptional(),
             deskripsi: schema.string([rules.trim(), rules.minLength(10)]),
-            job_summary: schema.string([rules.trim(), rules.minLength(10)]),
-            job_requirement: schema.string([rules.trim(), rules.minLength(10)]),
+            jobSummary: schema.string([rules.trim(), rules.minLength(10)]),
+            jobRequirement: schema.string([rules.trim(), rules.minLength(10)]),
         })
 
         try {

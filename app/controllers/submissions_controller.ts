@@ -88,11 +88,13 @@ export default class SubmissionsController {
     }
 
     public async show({ params, response }: HttpContext) {
-        const submission = await Submission.query().where('id', params.id).preload('position').first()
-        if (!submission) {
+        try {
+            const submission = await Submission.findOrFail(params.id)
+            await submission.load('position')
+            return response.ok(submission)
+        } catch (error) {
             return response.notFound({ message: 'Lamaran tidak ditemukan.' })
         }
-        return response.ok(submission)
     }
 
     public async update({ params, request, response }: HttpContext) {

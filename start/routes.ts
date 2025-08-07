@@ -29,7 +29,7 @@ router.get('/', async () => {
 router.get('promos', [PromosController, 'index']) 
 router.post('promos', [PromosController, 'store'])
 router.get('promos/:id', [PromosController, 'show'])
-router.put('promos/:id', [PromosController, 'update'])
+router.post('promos/:id', [PromosController, 'update'])
 router.delete('promos/:id', [PromosController, 'destroy'])
 
 // FAQ
@@ -56,7 +56,7 @@ router.delete('kariers/:id', [KariersController, 'destroy'])
 router.get('menus', [MenusController, 'index'])
 router.post('menus', [MenusController, 'store'])
 router.get('menus/:id', [MenusController, 'show'])
-router.put('menus/:id', [MenusController, 'update'])
+router.post('menus/:id', [MenusController, 'update'])
 router.delete('menus/:id', [MenusController, 'destroy'])
 
 // Lokasi

@@ -38,10 +38,10 @@ export default class Karier extends BaseModel {
   declare deskripsi: string
 
   @column()
-  declare job_summary: string
+  declare jobSummary: string
 
   @column()
-  declare job_requirement: string
+  declare jobRequirement: string
 
   @column.dateTime({ autoCreate: true })
   declare dbCreatedAt: DateTime 
