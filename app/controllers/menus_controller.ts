@@ -71,6 +71,19 @@ export default class MenusController {
     }
   }
 
+  public async getCategories({ response }: HttpContext) {
+    try {
+      const categories = await Menu.query().distinct('category').orderBy('category', 'asc')
+
+      const categoryNames = categories.map(item => item.category)
+
+      return response.ok(categoryNames)
+    } catch (error) {
+      console.error('Gagal mengambil kategori:', error)
+      return response.internalServerError({ message: 'Gagal mengambil daftar kategori' })
+    }
+  }
+
   public async show({ params, response }: HttpContext) {
     const menu = await Menu.find(params.id);
     if (!menu) {

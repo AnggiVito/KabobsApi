@@ -4,6 +4,26 @@ import { schema, rules } from '@adonisjs/validator'
 import app from '@adonisjs/core/services/app'
 import * as fs from 'node:fs/promises'
 
+
+enum SubmissionStatus {
+    BARU = 1,
+    SHORTLIST = 2,
+    INTERVIEW = 3,
+}
+
+function getStatusText(status: number): string {
+    switch (status) {
+        case SubmissionStatus.BARU:
+        return 'Baru'
+        case SubmissionStatus.SHORTLIST:
+        return 'Shortlist'
+        case SubmissionStatus.INTERVIEW:
+        return 'Interview'
+        default:
+        return 'Tidak Diketahui'
+    }
+}
+
 export default class SubmissionsController {
     public async store({ request, response }: HttpContext) {
         const applicationSchema = schema.create({
@@ -26,6 +46,7 @@ export default class SubmissionsController {
             cvFile: schema.file({ size: '5mb', extnames: ['pdf'] }),
             ktpFile: schema.file({ size: '5mb', extnames: ['jpg', 'png', 'jpeg'] }),
             npwpFile: schema.file({ size: '5mb', extnames: ['jpg', 'png', 'jpeg', 'pdf'] }),
+            status: schema.number.optional(),
         })
 
         try {
@@ -62,6 +83,7 @@ export default class SubmissionsController {
                 cvPath: `submissions/cvs/${cvFileName}`,
                 ktpPath: `submissions/ktp/${ktpFileName}`,
                 npwpPath: `submissions/npwp/${npwpFileName}`,
+                status: SubmissionStatus.BARU,
             })
 
             return response.created({
@@ -82,19 +104,56 @@ export default class SubmissionsController {
         }
     }
 
-    public async index({ response }: HttpContext) {
-        const submissions = await Submission.query().preload('position').orderBy('created_at', 'desc')
-        return response.ok(submissions)
+    public async index({ request, response }: HttpContext) {
+        const status = request.input('status')
+        const query = Submission.query().preload('position').orderBy('created_at', 'desc')
+
+        if (status) {
+            query.where('status', status)
+        }
+
+        const submissions = await query
+        const responseData = submissions.map(submission => {
+            const submissionJson = submission.serialize()
+            return {
+                ...submissionJson,
+                statusText: getStatusText(submissionJson.status)
+            }
+        })
+
+        return response.ok(responseData)
     }
 
     public async show({ params, response }: HttpContext) {
         try {
             const submission = await Submission.findOrFail(params.id)
             await submission.load('position')
-            return response.ok(submission)
+
+            const submissionJson = submission.serialize()
+            const responseData = {
+                ...submissionJson,
+                statusText: getStatusText(submissionJson.status)
+            }
+
+            return response.ok(responseData)
         } catch (error) {
             return response.notFound({ message: 'Lamaran tidak ditemukan.' })
         }
+    }
+
+    public async updateStatus({ params, request, response }: HttpContext) {
+        const submission = await Submission.findOrFail(params.id)
+        
+        const statusSchema = schema.create({
+            status: schema.number([rules.range(1, 3)])
+        })
+        
+        const payload = await request.validate({ schema: statusSchema })
+        
+        submission.status = payload.status
+        await submission.save()
+        
+        return response.ok(submission)
     }
 
     public async update({ params, request, response }: HttpContext) {
@@ -123,6 +182,7 @@ export default class SubmissionsController {
             cvFile: schema.file.optional({ size: '5mb', extnames: ['pdf'] }),
             ktpFile: schema.file.optional({ size: '5mb', extnames: ['jpg', 'png', 'jpeg'] }),
             npwpFile: schema.file.optional({ size: '5mb', extnames: ['jpg', 'png', 'jpeg', 'pdf'] }),
+            status: schema.number.optional(),
         })
 
         try {

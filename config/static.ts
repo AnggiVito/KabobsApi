@@ -7,14 +7,14 @@ const staticServerConfig = defineConfig({
   /**
    * Enable or disable serving static files
    */
-  enabled: true, // <--- PASTIKAN NILAI INI ADALAH 'true'
+  enabled: true,
 
   /**
    * The root directory from which to serve static files. The URL
    * will be constructed by joining the root directory with the
    * request URL.
    */
-  // publicPath: '', // Biarkan default jika file ada di folder 'public'
+  // publicPath: '', 
 
   /**
    * Browsers should cache static files for the following duration.

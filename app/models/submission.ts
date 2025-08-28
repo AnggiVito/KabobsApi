@@ -72,6 +72,9 @@ export default class Submission extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime
 
+  @column()
+  declare status: number
+
   // Relasi ke model Karier
   @belongsTo(() => Karier, {
     foreignKey: 'positionId',

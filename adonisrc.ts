@@ -73,6 +73,11 @@ export default defineConfig({
   | and add additional suites.
   |
   */
+  directories: {
+    // ...
+    public: 'public', // Pastikan baris ini ada
+  },
+  
   tests: {
     suites: [
       {
